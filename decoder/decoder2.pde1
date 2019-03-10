@@ -1,0 +1,117 @@
+int col ;
+int counter = 0;
+String[] values ;
+String line;
+PImage img;
+int widthee,heightee;
+int[] colorTable;
+BufferedReader input;
+void setup() {
+  String widthe = "512";
+  String heighte = "512" ;
+  //print ("rapid" + "eye");
+  fullScreen();
+  //size(800,500);
+  //img = loadImage("im.jpg");
+  //loadPixels();
+  //img.loadPixels();
+  input = createReader("code.txt");
+  for(int i = 0 ; i < 2 ;i++){  
+    try {
+      line = input.readLine();
+    }
+    catch(IOException e) {
+      e.printStackTrace(); 
+      line = null;
+    }
+    if (line == null ) {
+      break;
+    } else {
+        if(i==0) widthe = line;
+        else heighte = line;
+    }
+  }
+  int size = Integer.parseInt(widthe) * Integer.parseInt(heighte);
+  widthee = Integer.parseInt(widthe);
+  heightee = Integer.parseInt(heighte);
+  colorTable = new int [size];
+  print(width);
+}
+void draw() {
+  int pos=0;
+  loadPixels();
+  //delay(1000);
+
+  for(int k=0;k<heightee;k++) {
+    for(int j=0; j < widthee;j++){
+    try {
+      line = input.readLine();
+    } 
+    catch(IOException e) {
+      e.printStackTrace(); 
+      line = null;
+    }
+    if (line == null ) {
+      break;
+    } else {
+      if (unhex(line.substring(0,1)) == 8) {
+        int value;
+        value = unhex(line.substring(1, 6));
+        if (unhex(line.substring(7, 9)) == 255) {
+          int oldpos = j;
+          while (j < oldpos+value) {
+            color c = color(255, 255, 255);
+            //if(j %  widthee == 0) break;
+            pixels[k+j*widthee] = c;
+            //updatePixels();
+            j++;
+          }
+        } else if (unhex(line.substring(7, 9)) == 0) {
+          int oldpos = j;
+          while (j < oldpos + value) {
+            color c = color(0, 0, 0);
+            //if(j %  widthee == 0) break;
+            pixels[k+j*widthee] = c;
+            //updatePixels();
+            j++;
+
+          }
+        } else {
+          print("error in code file, unvalid characters ");
+          exit();
+        }
+      } else if (unhex(line.substring(0,1)) == 0) {
+        int value;
+        value = unhex (line.substring(1, 6));
+        int oldpos = j;
+        int i = 6;
+        while (j < oldpos + value) {
+          //if(line.substring(i+2, i+4) == "00") 
+          //print(unhex(line.substring(i+2,i+4)), "\n");
+          if (unhex(line.substring(i+1, i+3)) == 255) {
+            color c = color(255, 255, 255);
+            //if(j %  widthee == 0) break;
+            pixels[k+j*widthee] = c;
+            //updatePixels();
+            j++;
+          } else if (unhex(line.substring(i+1, i+3)) == 0) {
+            color c = color(0, 0, 0);
+            //if(j %  widthee == 0) break;
+            pixels[k+j*widthee] = c;
+            //updatePixels();
+            j++;
+          } else {
+            print("error in code file, unvalid characters ");
+          }
+          j++;
+          i += 3;
+        }
+      }
+    }
+    
+    //redraw();
+  }}
+  updatePixels();
+  //exit();
+  noLoop();  
+}

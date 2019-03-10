@@ -1,0 +1,119 @@
+
+// THERE IS AN ERROR !!!!! , IT COUNTS 2 same pixels as if they were 3, treat the case where no pixel is repeated 3 times or more
+
+int col ;
+int counter = 0;
+String value ;
+
+int[] colorTable = new int [512*512];
+PrintWriter output;
+void setup() {
+  //print ("rapid" + "eye");
+  size(512, 512);
+  for (int i= 0; i< 512; i ++) {
+    for (int j = 0; j< 512; j++) {
+      float col = 129;//random(0,255);       
+      //if ( i % 3 == 0 || i % 5 ==0 || i % 4 ==0) col = 0;
+      if(col<=128) col= 255;
+      else col = 255;
+      stroke(col, col, col);
+      fill(col, col, col);
+      point(i, j);
+      colorTable[counter] = (int) col;
+      counter++;
+    }
+    }
+    output = createWriter("code.txt");  
+    colorTable[1209] = colorTable[1210] = colorTable[11209] = colorTable[11212] = 0;    
+
+}
+/*int getColor(int loc){
+ loadPixels();
+ if (red(pixels[loc]) == 0 && green(pixels[loc]) == 0 && blue(pixels[loc]) == 0){ col = 0;return(col);}
+ else if (red(pixels[loc]) == 0 && green(pixels[loc]) == 0 && blue(pixels[loc]) == 0){ col = 255; return(col);}
+ else { print("not black and white, exiting..."); exit();}
+ 
+ return(col);
+ }*/
+void draw() {
+  loadPixels();
+  delay(1000);
+  int diffSucc, bSucc, wSucc;
+  int k , diff;
+  boolean hexPrinted = false;
+  diffSucc = bSucc = wSucc = 0;
+  for (int i=0; i<512*512; i++) {
+    hexPrinted = false;
+    if (bSucc != 3 && wSucc != 3) {
+      diffSucc++;
+      //print(diffSucc);
+      if (colorTable[i] == 0) {
+        //print("once you go black, you can't go back");
+        wSucc = 0;
+        bSucc++;
+      } else {
+        bSucc =0;
+        wSucc++;
+      }
+    }
+    if (bSucc == 3) {
+      diff = (i-2) - (i -(diffSucc -1));       
+      for (k = i - (diffSucc-1); k < i - 2; k++) {
+          if (!hexPrinted) {  
+            value = binary(diff,23);
+            diff =  unbinary(value);
+            print("(",hex(diff,6),"H) "); 
+            output.print("(" + hex(diff,6) + ") ");
+            hexPrinted = true;
+          }        
+        if (colorTable[k] == 0){ print("00H "); output.print("00H ");}
+        else {print("FFH "); output.print("FFH ");}
+      }
+      diffSucc = 0;
+      bSucc = 0;
+      i=i-2;
+      while (i < 512*512 && colorTable[i] == 0) {
+        bSucc++;
+        i++;
+      }
+      i--;
+      print("(",hex(bSucc+8388608,6),"H) ");
+      output.print("(" + hex(bSucc+8388608,6) + ") ");
+      output.print("00H ");
+      print("00H ");
+      bSucc = 0;
+      //write in 00H;
+    }
+    if (wSucc == 3) {
+      diff = (i-2) - (i -(diffSucc -1)); 
+      for (k = i - (diffSucc-1); k < i - 2; k++) {
+        if (!hexPrinted) { 
+          value = binary(diff,23);
+          diff = unbinary(value);
+          print("(",hex(diff,6),"H) ");
+          output.print("(" + hex(diff,6) + "H) ");
+          hexPrinted = true;
+        }
+        if (colorTable[k] == 0){print("00H "); output.print("00H ");}
+        else {print("FFH "); output.print("FFH ");}
+        }
+      diffSucc = 0;
+      wSucc = 0;
+      i=i-2;
+      while (i < 512*512 && colorTable[i] == 255) {
+        wSucc++;
+        i++;
+      }
+      i--;
+      print("(",hex(wSucc+8388608,6),"H) ");
+      output.print("("+hex(wSucc+8388608,6)+"H) ");
+      output.print("FFH ");
+      print("FFH ");
+      wSucc=0;
+    }
+  }
+  delay(1000);
+  output.close();
+  exit();
+  noLoop();
+}
